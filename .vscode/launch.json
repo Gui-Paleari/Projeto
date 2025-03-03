@@ -1,15 +1,25 @@
 {
-    "configurations": [
-        
+    "compounds": [
         {
-            "name": "Python Debugger: Django",
+            "name": "Django + Livereload",
+            "configurations": ["Django Server", "Livereload"]
+        }
+    ],
+    "configurations": [
+        {
+            "name": "Django Server",
             "type": "debugpy",
             "request": "launch",
-            "program": "${workspaceFolder}\\manage.py",
-            "args": [
-                "runserver"
-            ],
+            "program": "${workspaceFolder}/manage.py",
+            "args": ["runserver"],
             "django": true
+        },
+        {
+            "name": "Livereload",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/manage.py",
+            "args": ["livereload"]
         }
     ]
 }
