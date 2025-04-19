@@ -1,3 +1,5 @@
+from unittest.mock import patch
+
 from django.urls import resolve, reverse
 
 from recipes import views
@@ -54,3 +56,51 @@ class RecipeSearchViewTest(RecipeTestBase):
 
         self.assertIn(recipe1, response_both.context["recipes"])
         self.assertIn(recipe2, response_both.context["recipes"])
+
+    def test_recipe_search_if_shows_amount_recipes_found(self):
+        # Creates 15 recipes com títulos variados
+        recipes_all = []
+        for i in range(15):
+            if i in [1, 3, 7, 10, 11]:
+                # Títulos personalizados
+                custom_titles = {
+                    1: "Bolo de pistache",
+                    3: "Bolo de cenoura",
+                    7: "Macarrão com queijo",
+                    10: "Pizza de calabresa",
+                    11: "Pizza de frango",
+                }
+                title = custom_titles[i]
+            else:
+                title = f"Essa é a receita {i}"
+
+            recipes_all1 = self.make_recipe(
+                title=title,
+                slug=f"recipe-slug-{i}",
+                author_data={"username": f"username{i}"},
+            )
+            recipes_all.append(recipes_all1)
+        with patch("recipes.views.PER_PAGE", new=9):
+
+            search_url = reverse("recipes:search")
+
+            response__1 = self.client.get(f"{search_url}?q=pizza de")
+            recipes__1 = response__1.context["recipes"]
+
+            response__2 = self.client.get(
+                f"{search_url}?q=essa é a receita&page=1"
+            )  # ou ?q=essa é a receita"
+            recipes__2 = response__2.context["recipes"]
+
+            response__2_1 = self.client.get(
+                f"{search_url}?q=essa é a receita&page=2"
+            )
+            recipes__2_1 = response__2_1.context["recipes"]
+
+            response__3 = self.client.get(f"{search_url}?q=Bolo de pistache")
+
+            self.assertEqual(len(recipes_all), 15)
+            self.assertEqual(len(recipes__1), 2)
+            self.assertEqual(len(recipes__2), 9)
+            self.assertEqual(len(recipes__2_1), 1)
+            self.assertIn(recipes_all[1], response__3.context["recipes"])

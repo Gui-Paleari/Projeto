@@ -1,4 +1,7 @@
+import os
 from pathlib import Path
+
+from django.contrib.messages import constants
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -8,12 +11,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = (
-    "django-insecure-+n9*4h_k5o_6^r=h4j^_3&f!z&y2y($$5hld6$kji&#*7hp)^y"
-)
+SECRET_KEY = os.environ.get("SECRET_KEY", "INSECURE")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = True if os.environ.get("DEBUG") == "1" else False
 
 ALLOWED_HOSTS = ["localhost", "127.0.0.1"]
 
@@ -127,3 +128,11 @@ MEDIA_ROOT = BASE_DIR / "media"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 SHELL_PLUS = "ptpython"
+
+MESSAGE_TAGS = {
+    constants.DEBUG: "message-debug",
+    constants.ERROR: "message-error",
+    constants.INFO: "message-info",
+    constants.SUCCESS: "message-success",
+    constants.WARNING: "message-warning",
+}
