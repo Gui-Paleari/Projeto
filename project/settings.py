@@ -1,6 +1,7 @@
 import os
 from pathlib import Path
 
+import dj_database_url
 from django.contrib.messages import constants
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -14,9 +15,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.environ.get("SECRET_KEY", "INSECURE")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True if os.environ.get("DEBUG") == "1" else False
+DEBUG = os.environ.get("DEBUG") == "1"
 
-ALLOWED_HOSTS = ["localhost", "127.0.0.1"]
+ALLOWED_HOSTS = ["*"]
 
 
 # Application definition
@@ -136,3 +137,13 @@ MESSAGE_TAGS = {
     constants.SUCCESS: "message-success",
     constants.WARNING: "message-warning",
 }
+
+# Static files via WhiteNoise
+MIDDLEWARE.insert(1, "whitenoise.middleware.WhiteNoiseMiddleware")
+
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+
+# PostgreSQL via Render
+DATABASES["default"] = dj_database_url.config(
+    default=os.getenv("DATABASE_URL"), conn_max_age=600, ssl_require=True
+)
