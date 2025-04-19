@@ -137,13 +137,7 @@ MESSAGE_TAGS = {
     constants.SUCCESS: "message-success",
     constants.WARNING: "message-warning",
 }
-
 # Static files via WhiteNoise
 MIDDLEWARE.insert(1, "whitenoise.middleware.WhiteNoiseMiddleware")
 
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
-
-# PostgreSQL via Render
-DATABASES["default"] = dj_database_url.config(
-    default=os.getenv("DATABASE_URL"), conn_max_age=600, ssl_require=True
-)
