@@ -16,7 +16,7 @@ SECRET_KEY = os.environ.get("SECRET_KEY", "INSECURE")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get("DEBUG") == "1"
 
-ALLOWED_HOSTS = ["*"]
+ALLOWED_HOSTS = ["localhost", "127.0.0.1"]
 
 
 # Application definition
@@ -29,8 +29,9 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "livereload",
-    "recipes",
     "django_extensions",
+    "recipes",
+    "authors",
 ]
 
 MIDDLEWARE = [
@@ -136,7 +137,3 @@ MESSAGE_TAGS = {
     constants.SUCCESS: "message-success",
     constants.WARNING: "message-warning",
 }
-# Static files via WhiteNoise
-MIDDLEWARE.insert(1, "whitenoise.middleware.WhiteNoiseMiddleware")
-
-STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
