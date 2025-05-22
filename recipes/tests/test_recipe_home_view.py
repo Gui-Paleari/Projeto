@@ -12,7 +12,7 @@ class RecipeHomeViewTest(RecipeTestBase):
     # Testes para Home ---------------------------------------------------------
     def test_recipe_home_view_function_is_correct(self):
         view = resolve(reverse("recipes:home"))
-        self.assertIs(view.func, views.home)
+        self.assertIs(view.func.view_class, views.RecipeListViewHome)
 
     def test_recipe_home_view_returns_status_code_200_OK(self):
         response = self.client.get(reverse("recipes:home"))
@@ -51,16 +51,12 @@ class RecipeHomeViewTest(RecipeTestBase):
             "No recipes found here 😢", response.content.decode("utf-8")
         )
 
-    # Teste para saber se a quantidade de receita criada é igual a quantidade
+    # Teste para saber se a quantidade de receita criada é igual a quantidade -
     # de receitas mostrada na pagina
     def test_recipe_home_template_shows_amount_recipes_found(self):
         # Creates 15 recipes
-        for i in range(15):
-            self.make_recipe(
-                title=f"Recipe {i}",
-                slug=f"recipe-slug-{i}",
-                author_data={"username": f"username{i}"},
-            )
+        self.make_recipe_in_batch(qtd=15)
+
         # Aqui eu quero q mostra 8 receitas na pagina com o new=8
         with patch("recipes.views.PER_PAGE", new=8):
             response = self.client.get(reverse("recipes:home"))
@@ -68,16 +64,9 @@ class RecipeHomeViewTest(RecipeTestBase):
             self.assertEqual(len(recipes), 8)
 
     # Mesmo teste de antes porem pra saber quanto mostra na proxima pagina
-    def test_recipe_home_template_shows_amount_recipes_found_in_second_page(
-        self,
-    ):
+    def test_recipe_home_template_shows_qty_recipes_found_in_second_page(self):
         # Creates 15 recipes
-        for i in range(15):
-            self.make_recipe(
-                title=f"Recipe {i}",
-                slug=f"recipe-slug-{i}",
-                author_data={"username": f"username{i}"},
-            )
+        self.make_recipe_in_batch(qtd=15)
         # Aqui quero que mostra quantas receitas tem na segunda pagina
         with patch("recipes.views.PER_PAGE", new=8):
             response = self.client.get(reverse("recipes:home") + "?page=2")
@@ -86,14 +75,8 @@ class RecipeHomeViewTest(RecipeTestBase):
 
     # Teste pra saber a quantidade de paginas geradas por receitas criadas
     def test_recipe_home_is_paginated(self):
-        for i in range(15):
-            kwargs = {
-                "title": f"Recipe {i}",
-                "slug": f"recipe-slug-{i}",
-                "author_data": {"username": f"username{i}"},
-            }
-            self.make_recipe(**kwargs)
-        # Aqui o teste é de paginacao, mais pra saber
+        self.make_recipe_in_batch(qtd=15)
+        # Aqui o teste é de paginacao, mais pra saber -
         # quantas paginas gerou com o numero de receita criado
         with patch("recipes.views.PER_PAGE", new=4):
             response = self.client.get(reverse("recipes:home"))
@@ -106,13 +89,7 @@ class RecipeHomeViewTest(RecipeTestBase):
             self.assertEqual(len(paginator.get_page(4)), 3)
 
     def test_invalid_page_query_uses_page_one(self):
-        for i in range(15):
-            kwargs = {
-                "title": f"Recipe {i}",
-                "slug": f"recipe-slug-{i}",
-                "author_data": {"username": f"username{i}"},
-            }
-            self.make_recipe(**kwargs)
+        self.make_recipe_in_batch(qtd=15)
 
         with patch("recipes.views.PER_PAGE", new=4):
             response = self.client.get(reverse("recipes:home") + "?page=1A")

@@ -14,7 +14,7 @@ class RecipeCategoryViewTest(RecipeTestBase):
         view = resolve(
             reverse("recipes:category", kwargs={"category_id": 1000})
         )
-        self.assertIs(view.func, views.category)
+        self.assertIs(view.func.view_class, views.RecipeListViewCategory)
 
     def test_recipe_category_view_returns_404_is_no_recipes_found(self):
         response = self.client.get(
@@ -39,7 +39,7 @@ class RecipeCategoryViewTest(RecipeTestBase):
         # Need a recipe for this test
         recipe = self.make_recipe(is_published=False)
         response = self.client.get(
-            reverse("recipes:recipe", kwargs={"id": recipe.category.id})
+            reverse("recipes:recipe", kwargs={"pk": recipe.category.id})
         )
 
         self.assertEqual(response.status_code, 404)
@@ -68,6 +68,7 @@ class RecipeCategoryViewTest(RecipeTestBase):
     ):
         category = self.make_category(name="Category Teste")
         # Creates 15 recipes
+        # sourcery skip: no-loop-in-tests
         for i in range(15):
             recipe = self.make_recipe(
                 title=f"Recipe {i}",
@@ -77,7 +78,7 @@ class RecipeCategoryViewTest(RecipeTestBase):
             recipe.category = category
             recipe.save()
         with patch("recipes.views.PER_PAGE", new=9):
-            # Check if the number of recipes on the second page has loaded correctly
+            # Check number of recipes on the second page has loaded correctly
             response = self.client.get(
                 reverse("recipes:category", args=(category.id,)) + "?page=2"
             )
