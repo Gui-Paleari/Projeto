@@ -1,3 +1,4 @@
+# sourcery skip: boolean-if-exp-identity, remove-unnecessary-cast
 import os
 from pathlib import Path
 
@@ -14,7 +15,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.environ.get("SECRET_KEY", "INSECURE")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.environ.get("DEBUG") == "1"
+DEBUG = True if os.environ.get("DEBUG") == "1" else False
 
 ALLOWED_HOSTS = ["*"]
 
